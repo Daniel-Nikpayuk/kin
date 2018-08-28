@@ -51,8 +51,9 @@ define operator byte1 + byte2 :=
 
 	for (step k in [0-7])
 	{
-		byte3/k = byte1/k + byte2/k + carry;
-		carry	= (byte1/k == 1 && byte2/k == 1);
+		byte3/k			= byte1/k + byte2/k + carry;
+		if (carry)	carry	= (byte1/k == 1 || byte2/k == 1);
+		else		carry	= (byte1/k == 1 && byte2/k == 1);
 	}
 
 	return byte3;
