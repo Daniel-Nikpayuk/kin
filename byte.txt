@@ -1,0 +1,82 @@
+/************************************************************************************************************************
+**
+** Copyright 2018 Daniel Nikpayuk, Inuit Nunangat, The Inuit Nation
+**
+** This file is part of kin.
+**
+** kin is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+**
+** kin is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+** of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License along with kin. If not, see
+** <http://www.gnu.org/licenses/>.
+**
+************************************************************************************************************************/
+
+define type byte :=
+{
+	instances: /[0-7]/(0+1)
+
+	prototype: /[0-7]
+	potentype: /[0-7]/{0,1}
+}
+
+/*
+	Notes:
+
+	The medium of logical exchange in this language is NOT a type, but rather a concept. The grammar starts with
+	steps and paths as its atoms. From this, one develops a filter algebra which is just a predicate logic of
+	steps and paths, subpaths, collections of paths, etc.
+
+	A concept is dual to a filter. The more restrictions one adds to a filter (predicate), the more restricted
+	the concept. Alternatively: The larger the filter, the smaller its dual concept. The process of restricting a
+	concept is called concept resolution.
+
+	A type instance is a collection of paths. A type is a collection of type instances. One can get an initial feel
+	for a type by looking at its prototype (intuitively: greatest common divisor), as well as its potentype
+	("potential" + "type": capacity, or least common multiple).
+
+	Here, a byte starts from a root having 8 direct children [0-7] (steps), where each child has one child of its
+	own using alternative steps {0,1}.
+*/
+
+/***********************************************************************************************************************/
+
+define operator byte1 + byte2 :=
+{
+	concept byte3 = /[0-7];
+	step carry = 0;
+
+	for (step k in [0-7])
+	{
+		byte3/k = byte1/k + byte2/k + carry;
+		carry	= (byte1/k == 1 && byte2/k == 1);
+	}
+
+	return byte3;
+}
+
+/*
+	Notes:
+
+	The strength (and largely the purpose) of this language is in its expressive grammar. In traditional programming
+	languages, variables represent bindings between a type and an instance. Some languages allow for mutation of the
+	instance while others do not.
+
+	With this language, variables instead represent concepts. Concepts sometimes coincide with types, but they also
+	sometimes coincide with type instances. Most of the time they coincide with neither, and instead are able to
+	represent broader patterns altogether.
+
+	There is no need for polymorphic typing as one can use a concept instead. Concepts are additive, meaning you can
+	always add to the concept filter, but you can never subtract from it. Lexical scoping empowers the reuse of a
+	given variable while offering concept resolution within its scoped context. A type can thus be represented by
+	its prototype. Regarding type resolution: In the case where filters are added to the point where the concept
+	resolves to an instance, such an occurence is called identity resolution.
+
+	Above, the anonymous concept "/[0-7]" represents any other concept which can be extended from it. In
+	practice, it means you can define weakly specified algorithms, and when they're called, you simply resolve the
+	input.
+*/
+
